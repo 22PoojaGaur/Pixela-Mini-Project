@@ -63,7 +63,7 @@ def record_data_in_habit(cmd_list: List):
 
     request_body = {
         "date": cmd_list[3],
-        "quantity":"1"
+        "quantity": "1"
     }
 
     response = requests.post(url=URL, headers=request_header, json=request_body)
