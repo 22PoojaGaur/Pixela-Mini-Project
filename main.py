@@ -1,8 +1,10 @@
 from typing import List
 
+import db_utils
 import utils
 
 if __name__ == '__main__':
+    db_utils.setup()
     while True:
         command: str = input("Enter your command ->\n")
         cmd_list: List[str] = command.split(' ')
