@@ -1,18 +1,29 @@
+import string
 import sys
+import random
 from typing import List
 import requests
+import db_utils
+
 
 
 def generate_graph_id(username: str, habit: str):
     return f"{username}-{habit}"[0:16]
 
 
+def generate_token():
+    res = ''.join(random.choices(string.ascii_uppercase +
+                                 string.digits, k=15))
+    return res
+
+
 def create_user(cmd_list: List):
     URL = "https://pixe.la/v1/users"
+    token = generate_token()
 
     request_body = {
         "username": cmd_list[1],
-        "token": "issecret",
+        "token": token,
         "agreeTermsOfService": "yes",
         "notMinor": "yes"
         }
@@ -20,6 +31,7 @@ def create_user(cmd_list: List):
     response = requests.post(url=URL, json=request_body)
 
     if response.status_code == 200:
+        db_utils.create_user_db(cmd_list[1], token)
         print(f'message -> {response.json()["message"]}')
         print("User created successfully")
     else:
@@ -39,7 +51,7 @@ def add_habit_for_user(cmd_list: List):
     }
 
     header = {
-        "X-USER-TOKEN": "issecret"
+        "X-USER-TOKEN": db_utils.get_token(cmd_list[1])
     }
 
     response = requests.post(url=URL, headers=header, json=request_body)
@@ -58,7 +70,7 @@ def record_data_in_habit(cmd_list: List):
     URL = f"https://pixe.la/v1/users/{cmd_list[1]}/graphs/{graph_id}"
 
     request_header = {
-        "X-USER-TOKEN": "issecret"
+        "X-USER-TOKEN": db_utils.get_token(cmd_list[1])
     }
 
     request_body = {
@@ -82,6 +94,13 @@ def get_data(cmd_list: List):
     URL = f"https://pixe.la/v1/users/{cmd_list[1]}/graphs/{graph_id}.html"
 
     print(f"Hi, Please check your habit graph on this link ->{URL}")
+
+
+def list_user_habits(cmd_list: List):
+    """
+    Returns all habits present for user
+    """
+    pass
 
 
 def help_msg():
