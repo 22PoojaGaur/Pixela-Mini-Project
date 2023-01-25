@@ -15,6 +15,8 @@ if __name__ == '__main__':
             utils.add_habit_for_user(cmd_list)
         elif cmd_list[0] == "record":
             utils.record_data_in_habit(cmd_list)
+        elif cmd_list[0] == "list":
+            utils.list_user_habits(cmd_list)
         elif cmd_list[0] == "get":
             utils.get_data(cmd_list)
         elif cmd_list[0] == "help":

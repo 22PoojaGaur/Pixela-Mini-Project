@@ -6,9 +6,9 @@ import requests
 import db_utils
 
 
-
-def generate_graph_id(username: str, habit: str):
-    return f"{username}-{habit}"[0:16]
+def generate_graph_id():
+    return ''.join(
+        random.choices(string.ascii_lowercase, k=12))
 
 
 def generate_token():
@@ -35,15 +35,18 @@ def create_user(cmd_list: List):
         print(f'message -> {response.json()["message"]}')
         print("User created successfully")
     else:
-        print(f'Status code -> {response.status_code}')
+        print(f'Status code -> {response.json()}')
         print("Try again!")
 
 
 def add_habit_for_user(cmd_list: List):
     URL = f'https://pixe.la/v1/users/{cmd_list[1]}/graphs'
 
+    graph_id = generate_graph_id()
+    print(f'graph id -> >{graph_id}')
+
     request_body = {
-        "id": generate_graph_id(cmd_list[1], cmd_list[2]),
+        "id": graph_id,
         "name": cmd_list[2],
         "unit": "commit",
         "type": "int",
@@ -57,16 +60,18 @@ def add_habit_for_user(cmd_list: List):
     response = requests.post(url=URL, headers=header, json=request_body)
 
     if response.status_code == 200:
+        user_id = db_utils.get_user_id(cmd_list[1])
+        db_utils.create_habit_for_user_db(user_id, cmd_list[2], graph_id)
         print(f'message -> {response.json()["message"]}')
         print("Graph created successfully")
     else:
-        print(f'Status code -> {response.status_code}')
+        print(f'Status code -> {response.json()}')
         print("Try again!")
 
 
 def record_data_in_habit(cmd_list: List):
 
-    graph_id = generate_graph_id(cmd_list[1], cmd_list[2])
+    graph_id = db_utils.get_graph_id(cmd_list[1], cmd_list[2])
     URL = f"https://pixe.la/v1/users/{cmd_list[1]}/graphs/{graph_id}"
 
     request_header = {
@@ -81,15 +86,16 @@ def record_data_in_habit(cmd_list: List):
     response = requests.post(url=URL, headers=request_header, json=request_body)
 
     if response.status_code == 200:
+        db_utils.create_record_db(graph_id,cmd_list[3])
         print(f'message -> {response.json()["message"]}')
         print("Entry added in habit graph")
     else:
-        print(f'Status code -> {response.status_code}')
+        print(f'Status code -> {response.json()}')
         print("Try again!")
 
 
 def get_data(cmd_list: List):
-    graph_id = generate_graph_id(cmd_list[1], cmd_list[2])
+    graph_id = db_utils.get_graph_id(cmd_list[1], cmd_list[2])
 
     URL = f"https://pixe.la/v1/users/{cmd_list[1]}/graphs/{graph_id}.html"
 
@@ -100,7 +106,8 @@ def list_user_habits(cmd_list: List):
     """
     Returns all habits present for user
     """
-    pass
+    result = db_utils.get_user_habits(cmd_list[1])
+    print(f"List of all habits for {cmd_list[1]} ->{result}")
 
 
 def help_msg():

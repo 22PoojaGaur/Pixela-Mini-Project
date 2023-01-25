@@ -8,3 +8,4 @@ Here's the list of available commands -
     add <username> <habit_name>  : Add tracker for a new habit
     record <username> <habit_name> <value> : Add entry for the habit
     get <username> <habit_name> : Get link to see the habit graph
+    list <username> : List habits for user

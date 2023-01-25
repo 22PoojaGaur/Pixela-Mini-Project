@@ -57,13 +57,13 @@ def test_add_habit_for_user_failure(mocker, capsys):
     assert "Try again!" in captured.out
 
 
-def test_generate_graph_id():
-    username = "pooja"
-    habit = "habit1"
-
-    result = generate_graph_id(username, habit)
-
-    assert result == f"{username}-{habit}"[0:16]
+# def test_generate_graph_id():
+#     username = "pooja"
+#     habit = "habit1"
+#
+#     result = generate_graph_id(username, habit)
+#
+#     assert result == f"{username}-{habit}"[0:16]
 
 
 def test_record_data_in_habit_successfully(mocker, capsys):
